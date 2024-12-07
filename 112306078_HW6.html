@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1A2B Number Guessing Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #game-log {
+            margin-top: 20px;
+        }
+        .log-entry {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>112306078_HW6_1A2B</h1>
+    <input type="text" id="user-input" placeholder="請輸入四個不重複的數字" maxlength="4">
+    <button id="submit-btn">送出</button>
+    <div id="game-log">
+        <h2>遊戲紀錄：</h2>
+        <div id="log-entries"></div>
+    </div>
+
+    <script>
+        // 產生一個不重複的四位數
+        function generateAnswer() {
+            const digits = [];
+            while (digits.length < 4) {
+                const num = Math.floor(Math.random() * 10); // 0-9 的隨機數字
+                if (!digits.includes(num)) {
+                    digits.push(num);
+                }
+            }
+            return digits.join(''); // 回傳為字串格式
+        }
+
+        // 計算幾A幾B
+        function calculateAB(answer, guess) {
+            let a = 0, b = 0;
+            for (let i = 0; i < guess.length; i++) {
+                if (guess[i] === answer[i]) {
+                    a++;
+                } else if (answer.includes(guess[i])) {
+                    b++;
+                }
+            }
+            return { a, b };
+        }
+
+        // 驗證輸入是否合法
+        function isValidInput(input) {
+            if (input.length !== 4) {
+                alert("請輸入 4 個數字！");
+                return false;
+            }
+            if (isNaN(input)) {
+                alert("請輸入有效的數字！");
+                return false;
+            }
+            if (new Set(input).size !== 4) {
+                alert("數字不能重複！");
+                return false;
+            }
+            return true;
+        }
+
+        // 初始化變數
+        const answer = generateAnswer(); // 答案
+        let attempt = 0; // 嘗試次數
+        const logEntries = document.getElementById("log-entries");
+        const submitBtn = document.getElementById("submit-btn");
+
+        console.log("答案是：" + answer); // 為了測試時使用，正式遊戲中可移除
+
+        // 處理送出按鈕點擊
+        submitBtn.addEventListener("click", () => {
+            const userInput = document.getElementById("user-input").value.trim();
+            
+            // 驗證使用者輸入
+            if (!isValidInput(userInput)) {
+                return; // 如果輸入不合法，直接退出
+            }
+
+            attempt++; // 嘗試次數 +1
+            const { a, b } = calculateAB(answer, userInput); // 計算幾A幾B
+            
+            // 新增遊戲紀錄
+            const logEntry = document.createElement("div");
+            logEntry.classList.add("log-entry");
+            logEntry.textContent = `第 ${attempt} 次: ${userInput} -> ${a}A${b}B`;
+            logEntries.appendChild(logEntry);
+
+            // 判斷是否結束遊戲
+            if (a === 4) {
+                alert(`恭喜你答對了！答案是 ${answer}，你共嘗試了 ${attempt} 次。`);
+                submitBtn.disabled = true; // 禁用送出按鈕
+            }
+        });
+    </script>
+</body>
+</html>
